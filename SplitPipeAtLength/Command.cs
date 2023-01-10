@@ -44,8 +44,10 @@ namespace SplitPipeAtLength
     }
 
     //SplitPipe void, need a doc and a pipe as element
-    public void SplitPipe(Document doc, Pipe pipe)
+    public void SplitPipe(Pipe pipe)
     {
+      Document doc = pipe.Document;
+
       // Get the curve of the pipe
       Line line = (pipe.Location as LocationCurve).Curve as Line;
 
@@ -69,8 +71,9 @@ namespace SplitPipeAtLength
         tx.Start("Opdelen leiding");
 
         //While remainlength > 5000mm
-        while (remainingLength > UnitUtils.ConvertToInternalUnits(5000,
-          //DisplayUnitType.DUT_MILLIMETERS))
+        while (remainingLength > UnitUtils.ConvertToInternalUnits(
+          5000, 
+          //DisplayUnitType.DUT_MILLIMETERS
           UnitTypeId.Millimeters))
         {
           i++;
@@ -250,7 +253,7 @@ namespace SplitPipeAtLength
         {
           Pipe pipe = doc.GetElement(r.ElementId) as Pipe;
 
-          SplitPipe(doc, pipe);
+          SplitPipe(pipe);
         }
         return Result.Succeeded;
       }
