@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
   <AddIn Type="Command">
-    <Text>Command SplitPipeAtLength</Text>
+    <Text>SplitPipeAtLength</Text>
     <Description>Split pipe and place fittings at segment length</Description>
     <Assembly>SplitPipeAtLength.dll</Assembly>
     <FullClassName>SplitPipeAtLength.Command</FullClassName>
