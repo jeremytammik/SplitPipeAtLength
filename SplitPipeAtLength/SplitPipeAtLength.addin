@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>Command SplitPipeAtLength</Text>
+    <Description>Split pipe and place fittings at segment length</Description>
+    <Assembly>SplitPipeAtLength.dll</Assembly>
+    <FullClassName>SplitPipeAtLength.Command</FullClassName>
+    <ClientId>26ac1c0c-6a8f-442e-bc84-29a3cbbc8631</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+</RevitAddIns>
