@@ -6,7 +6,7 @@ on how to [break pipes and place fittings at segmentlength](https://forums.autod
 
 ## Authors
 
-Jan Willem v Asselt,
+Jan Willem van Asselt,
 [jw.vanasselt](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/8555692), 
 and Jeremy Tammik,
 [The Building Coder](http://thebuildingcoder.typepad.com),
