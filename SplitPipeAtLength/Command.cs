@@ -46,29 +46,34 @@ namespace SplitPipeAtLength
     //SplitPipe void, need a doc and a pipe as element
     public void SplitPipe(Document doc, Pipe pipe)
     {
-
       // Get the curve of the pipe
       Line line = (pipe.Location as LocationCurve).Curve as Line;
+
       //Startpoint
       XYZ startPoint = line.GetEndPoint(0);
+
       //Endpoint
       XYZ endPoint = line.GetEndPoint(1);
 
       // Initialize variables for the loop
       XYZ currentPoint = startPoint;
+
       //Length line
       double remainingLength = startPoint.DistanceTo(endPoint);
+
       // i for sequence
       int i = 0;
 
       using (Transaction tx = new Transaction(doc))
       {
         tx.Start("Opdelen leiding");
+
         //While remainlength > 5000mm
-        while (remainingLength > UnitUtils.ConvertToInternalUnits(5000, DisplayUnitType.DUT_MILLIMETERS))
+        while (remainingLength > UnitUtils.ConvertToInternalUnits(5000,
+          //DisplayUnitType.DUT_MILLIMETERS))
+          UnitTypeId.Millimeters))
         {
           i++;
-
 
           //Check size of the pipe
           string size = pipe.get_Parameter(BuiltInParameter.RBS_CALCULATED_SIZE).AsString();
@@ -151,20 +156,20 @@ namespace SplitPipeAtLength
           }
 
           //Use a remainder to check the restlength
-          double rest = remainingLength % UnitUtils.ConvertToInternalUnits(5000, DisplayUnitType.DUT_MILLIMETERS);
+          double rest = remainingLength % UnitUtils.ConvertToInternalUnits(5000, UnitTypeId.Millimeters);
           double segmentLength;
 
           //Check of rest length is greater than 100mm. Than use the splitlength (5000) + connector distance
-          if (rest > UnitUtils.ConvertToInternalUnits(100, DisplayUnitType.DUT_MILLIMETERS))
+          if (rest > UnitUtils.ConvertToInternalUnits(100, UnitTypeId.Millimeters))
           {
             //First item need to be length + distance, after that it need to be length + (2* distance)
             if (i == 1)
             {
-              segmentLength = UnitUtils.ConvertToInternalUnits(5000 + a, DisplayUnitType.DUT_MILLIMETERS);
+              segmentLength = UnitUtils.ConvertToInternalUnits(5000 + a, UnitTypeId.Millimeters);
             }
             else
             {
-              segmentLength = UnitUtils.ConvertToInternalUnits(5000 + (2 * a), DisplayUnitType.DUT_MILLIMETERS);
+              segmentLength = UnitUtils.ConvertToInternalUnits(5000 + (2 * a), UnitTypeId.Millimeters);
             }
           }
           //else split length in 4000mm + connector distance 
@@ -173,15 +178,13 @@ namespace SplitPipeAtLength
             //First item need to be length + distance, after that it need to be length + (2* distance)
             if (i == 1)
             {
-              segmentLength = UnitUtils.ConvertToInternalUnits(4000 + a, DisplayUnitType.DUT_MILLIMETERS);
+              segmentLength = UnitUtils.ConvertToInternalUnits(4000 + a, UnitTypeId.Millimeters);
             }
             else
             {
-              segmentLength = UnitUtils.ConvertToInternalUnits(4000 + (2 * a), DisplayUnitType.DUT_MILLIMETERS);
+              segmentLength = UnitUtils.ConvertToInternalUnits(4000 + (2 * a), UnitTypeId.Millimeters);
             }
           }
-
-
 
           // Calculate the length of the current segment
           double currentSegmentLength = Math.Min(segmentLength, remainingLength);
@@ -222,44 +225,11 @@ namespace SplitPipeAtLength
         }
         tx.Commit();
       }
-
     }
 
-
-    public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-    {
-      UIApplication uiapp = commandData.Application;
-      UIDocument uidoc = uiapp.ActiveUIDocument;
-      Application app = uiapp.Application;
-      Document doc = uidoc.Document;
-
-      // Select a pipe and use the pipeselection filter
-      ISelectionFilter pipeFilter = new PipeSelectionFilter();
-      try
-      {
-        Reference[] references = (Reference[])uidoc.Selection.PickObjects(ObjectType.Element, pipeFilter, "Selecteer pipes").ToArray();
-        foreach (Reference reference in references)
-        {
-          Pipe pipes = doc.GetElement(reference.ElementId) as Pipe;
-
-          SplitPipe(doc, pipes);
-
-        }
-        return Result.Succeeded;
-      }
-      catch
-      {
-        // Do nothing if the selection is null                
-        return Result.Cancelled;
-      }
-    }
-  }
-
-  public class Command2 : IExternalCommand
-  {
     public Result Execute(
-      ExternalCommandData commandData,
-      ref string message,
+      ExternalCommandData commandData, 
+      ref string message, 
       ElementSet elements)
     {
       UIApplication uiapp = commandData.Application;
@@ -267,34 +237,27 @@ namespace SplitPipeAtLength
       Application app = uiapp.Application;
       Document doc = uidoc.Document;
 
-      // Access current selection
+      // Select and process pipes
 
-      Selection sel = uidoc.Selection;
+      ISelectionFilter pipeFilter = new PipeSelectionFilter();
 
-      // Retrieve elements from database
-
-      FilteredElementCollector col
-        = new FilteredElementCollector(doc)
-          .WhereElementIsNotElementType()
-          .OfCategory(BuiltInCategory.INVALID)
-          .OfClass(typeof(Wall));
-
-      // Filtered element collector is iterable
-
-      foreach (Element e in col)
+      try
       {
-        Debug.Print(e.Name);
+        IList<Reference> references = uidoc.Selection.PickObjects( 
+          ObjectType.Element, pipeFilter, "Selecteer pipes");
+
+        foreach (Reference r in references)
+        {
+          Pipe pipe = doc.GetElement(r.ElementId) as Pipe;
+
+          SplitPipe(doc, pipe);
+        }
+        return Result.Succeeded;
       }
-
-      // Modify document within a transaction
-
-      using (Transaction tx = new Transaction(doc))
+      catch
       {
-        tx.Start("Transaction Name");
-        tx.Commit();
+        return Result.Cancelled;
       }
-
-      return Result.Succeeded;
     }
   }
 }
